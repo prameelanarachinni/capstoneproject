@@ -19,6 +19,7 @@ public class AppointmentDto {
 	private Integer doctorId;
 	@NotNull(message=" appointment_date is mandatory")
 	@FutureOrPresent
+	
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate appointmentDate;
 	public Integer getAppId() {

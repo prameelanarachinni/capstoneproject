@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.dto.AppointmentDto;
@@ -54,75 +55,52 @@ public class PatientService {
             return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
         } else {
             throw new CustomException("No doctor record found for specialization: " + specialization);}}
-	 /*public void bookAppointment(AppointmentDto appointmentDto) throws CustomException {
-		    // Build URL for doctor service and get the response
+	 
+	 public void bookAppointment(AppointmentDto appointmentDto) throws CustomException {
+		    // Validate doctor ID
 		    String doctorUrl = "http://doctor-service/doctors/" + appointmentDto.getDoctorId();
-		    ResponseEntity<DoctorDto> doctorResponse = restTemplate.getForEntity(doctorUrl, DoctorDto.class);
-
-		    if (doctorResponse.getStatusCode() == HttpStatus.OK) {
-		        DoctorDto doctor = doctorResponse.getBody();
-		        if (doctor == null) {
-		            throw new CustomException("No doctor found with ID " + appointmentDto.getDoctorId());
-		        }
-
-		        // Example validation for patient ID
-		        boolean isPatientValid = checkPatientValidity(appointmentDto.getPatientId());
-		        if (!isPatientValid) {
-		            throw new CustomException("Invalid Patient ID " + appointmentDto.getPatientId());
-		        }
-
-		        // Example validation for appointment date
-		        if (appointmentDto.getAppointmentDate() == null || appointmentDto.getAppointmentDate().isBefore(LocalDate.now())) {
-		            throw new CustomException("Appointment date cannot be null or in the past.");
-		        }
-
-		        // Check if an appointment already exists for the patient with the same doctor and date
-		        boolean isAppointmentAlreadyBooked = appointmentRepository.existsByPatientIdAndDoctorIdAndAppointmentDate(
-		            appointmentDto.getPatientId(),
-		            appointmentDto.getDoctorId(),
-		            appointmentDto.getAppointmentDate()
-		        );
-		        if (isAppointmentAlreadyBooked) {
-		            throw new CustomException("Appointment is already booked for this date.");
-		        }
-
-		        // Save the appointment
-		        Appointment appointment = new Appointment();
-		        appointment.setPatientId(appointmentDto.getPatientId());
-		        appointment.setDoctorId(appointmentDto.getDoctorId());
-		        appointment.setAppointmentDate(appointmentDto.getAppointmentDate());
-		        appointmentRepository.save(appointment);
-		    } else {
-		        throw new CustomException("Invalid Doctor ID " + appointmentDto.getDoctorId());
+		    ResponseEntity<DoctorDto> doctorResponse;
+		    try {
+		        doctorResponse = restTemplate.getForEntity(doctorUrl, DoctorDto.class);
+		    } catch (HttpClientErrorException e) {
+		        throw new CustomException("Invalid Doctor ID: " + appointmentDto.getDoctorId());
 		    }
+		    
+		    if (doctorResponse.getStatusCode() != HttpStatus.OK) {
+		        throw new CustomException("Invalid Doctor ID: " + appointmentDto.getDoctorId());
+		    }
+		    
+		    // Validate patient ID
+		    boolean patientExists = patientRepository.existsById(appointmentDto.getPatientId());
+		    if (!patientExists) {
+		        throw new CustomException("Invalid Patient ID: " + appointmentDto.getPatientId());
+		    }
+		    
+		    // Validate appointment date
+		    LocalDate appointmentDate = appointmentDto.getAppointmentDate();
+		    if (appointmentDate == null || appointmentDate.isBefore(LocalDate.now())) {
+		        throw new CustomException("Invalid appointment date. It must be a future date.");
+		    }
+		    
+		    // Save the appointment
+		    Appointment appointment = new Appointment();
+		    appointment.setPatientId(appointmentDto.getPatientId());
+		    appointment.setDoctorId(appointmentDto.getDoctorId());
+		    appointment.setAppointmentDate(appointmentDto.getAppointmentDate());
+		    appointmentRepository.save(appointment);
 		}
-	private boolean checkPatientValidity(Integer patientId) {
-		// TODO Auto-generated method stub
-		return false;*/
-	
+	 
+	 
+		   
+
 
     
-	 public void bookAppointment(AppointmentDto appointmentDto) throws CustomException {
+	/* public void bookAppointment(AppointmentDto appointmentDto) throws CustomException {
 		    String doctorUrl = "http://doctor-service/doctors/" + appointmentDto.getDoctorId();
 		    ResponseEntity<DoctorDto> doctorResponse = restTemplate.getForEntity(doctorUrl, DoctorDto.class);
 
 		    if (doctorResponse.getStatusCode() == HttpStatus.OK) {
-		        DoctorDto doctor = doctorResponse.getBody();
-		        if (doctor == null) {
-		            throw new CustomException("No doctor found with ID " + appointmentDto.getDoctorId());
-		        }
-
-		        // Example validation for patient ID (adjust as necessary)
-		        boolean isPatientValid = checkPatientValidity(appointmentDto.getPatientId());
-		        if (!isPatientValid) {
-		            throw new CustomException("Invalid Patient ID " + appointmentDto.getPatientId());
-		        }
-
-		        // Example validation for appointment date
-		        if (appointmentDto.getAppointmentDate() == null || appointmentDto.getAppointmentDate().isBefore(LocalDate.now())) {
-		            throw new CustomException("Appointment date cannot be null or in the past.");
-		        }
-
+		       
 		        // Save the appointment
 		        Appointment appointment = new Appointment();
 		        appointment.setPatientId(appointmentDto.getPatientId());
@@ -132,7 +110,9 @@ public class PatientService {
 		    } else {
 		        throw new CustomException("Invalid Doctor ID " + appointmentDto.getDoctorId());
 		    }
-		}
+		}*/
+	 
+	 
 
 		// Example method for checking patient validity
 		private boolean checkPatientValidity(Integer integer) {
@@ -143,37 +123,18 @@ public class PatientService {
 			// TODO Auto-generated method stub
 			return null;
 		}*/
-		public List<Appointment> findAppointmentsByPatientId(int patientId) {
+		/*public List<Appointment> findAppointmentsByPatientId(int patientId) {
 			// TODO Auto-generated method stub
-			return null;
-		}
+			return appointmentRepository.findByPatientId(patientId);
+		}*/
+		/*public List<Appointment> findAppointmentsByAppId(Integer appId) {
+			// TODO Auto-generated method stub
+			return appointmentRepository.findAppointmentsByAppId(appId);
+		}*/
 		
 
 
-   /* public void bookAppointment(AppointmentDto appointmentDto) throws CustomException {
-        
-        String doctorUrl = "http://doctor-service/doctors/" + appointmentDto.getDoctorId();
-       System.out.println(doctorUrl);
-        ResponseEntity<DoctorDto> doctorResponse = restTemplate.getForEntity(doctorUrl, DoctorDto.class);
-
-        if (doctorResponse.getStatusCode() == HttpStatus.OK) {
-        	System.out.println("Soma");
-            Appointment appointment = new Appointment();
-            appointment.setPatientId(appointmentDto.getPatientId());
-            appointment.setDoctorId(appointmentDto.getDoctorId());
-            appointment.setAppointmentDate(appointmentDto.getAppointmentDate());
-            appointmentRepository.save(appointment);
-        } else {
-            throw new CustomException("Invalid Doctor ID");
-        }*/
-    
-
-    /*public List<Appointment> getAppointmentsForCurrentMonth1() {
-       LocalDate now = LocalDate.now();
-       LocalDate startOfMonth = now.withDayOfMonth(1);
-       LocalDate endOfMonth = now.withDayOfMonth(now.lengthOfMonth());
-       return appointmentRepository.findByAppointmentDateBetween(startOfMonth, endOfMonth);*/
-        
+  
       
        
        

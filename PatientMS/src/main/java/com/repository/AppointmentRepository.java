@@ -9,7 +9,11 @@ import com.model.Patient;
 
 public interface AppointmentRepository extends CrudRepository<Patient, Integer> {
 
-public	void save(Appointment appointment);
+ public void save(Appointment appointment);
+
+//public List<Appointment> findByPatientId(int patientId);
+
+/*public List<Appointment> findAppointmentsByAppId(Integer appId);*/
 
 
 
